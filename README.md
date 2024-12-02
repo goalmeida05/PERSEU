@@ -1,10 +1,10 @@
-# MCLARENcpp
-MCLARENcpp MaChine LeArning pREdictioN of Cell Penetrating Peptide and their uptake efficiency
+# PERSEUcpp
+PERSEUcpp: A machine learning strategy to predict cell-penetrating peptides and their uptake efficiency
 
 
 Here is the translation in English:
 
-Our source code is titled MCLAREN.py, and in it, you will find how the descriptor calculations were done and how the model was trained. Additionally, the file contains three main functions:
+Our source code is titled PERSEU.py, and in it, you will find how the all descriptors calculations were done and how the model was trained. Additionally, the file contains three main functions:
 
 -  training_matrix(positives_path, negatives_path, save_path)
 -  training_model(training_matrix_path, save_path)
