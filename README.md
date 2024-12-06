@@ -2,18 +2,8 @@
 PERSEUcpp: A machine learning strategy to predict cell-penetrating peptides and their uptake efficiency
 
 
-Here is the translation in English:
+Our source code is titled PERSEU.py, and in it, you will find how the all descriptors calculations were done and how the model was trained.
 
-Our source code is titled PERSEU.py, and in it, you will find how the all descriptors calculations were done and how the model was trained. Additionally, the file contains three main functions:
+To run Perseu CPP, you only need to enter the path of the desired file. For example, if you have the file cpps-test.fasta, simply enter its full name and submit it. The CPPs and their respective efficiencies will be predicted.
 
--  training_matrix(positives_path, negatives_path, save_path)
--  training_model(training_matrix_path, save_path)
--  test_model(test_matrix_path, training_matrix_path, model_path, save_name)
-
-The first function, training_matrix, takes two files, positives_path and negatives_path (in CSV or FASTA format), calculates the descriptors, and saves them into a single file with a user-defined name (save_name).
-
-Note: You need to run the training_matrix function for both the test and training data.
-
-The second function, training_model, requires the path to the training dataset you generated with the previous function as a parameter, and you will define a path to save the model.
-
-Finally, test_model takes the test dataset, the training dataset (to ensure the test data was not part of the training), the model path generated from the previous function, and the path where you want to save the results.
+The model accepts both FASTA and CSV files. For the FASTA format, you must follow the standard FASTA file structure. For the CSV format, the file should contain a single column with only the sequences.
