@@ -6,16 +6,27 @@ This repository contains all code, datasets, models, and outputs necessary to re
 # Repository Structure
 .
 ├── DATASETS/              # Datasets used for training and testing
+
 ├── PERFORMANCE/           # Performance metrics for each dataset
+
 ├── RESULTS/               # Prediction results on each dataset
+
 ├── PERSEU_MODEL.pkl       # Trained model for CPP classification
+
 ├── PERSEU-EFFICIENCY.pkl  # (Optional) Efficiency prediction model (currently not fully integrated)
+
 ├── PerseuCPP.py           # Main script: feature extraction, model training, and prediction
+
 ├── aminos.json            # Amino acid group and ID mappings
+
 ├── utils.py               # Helper functions for feature extraction
+
 ├── wrong predicted sequences.csv
+
 ├── tests-results.csv
+
 ├── cpp-test.fasta         # Example file for testing
+
 └── README.md              # This file
 
 Our source code is titled PERSEUcpp.py, and in it, you will find how the all descriptors calculations were done and how the model was trained.
