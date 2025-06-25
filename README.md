@@ -47,9 +47,10 @@ You can set up your environment by running:
 ```bash
 python -m venv perseu-env
 source perseu-env/bin/activate  # On Windows use: perseu-env\Scripts\activate
-
+```
+```bash
 pip install -r requirements.txt
-
+```
 ## How to Run PERSEUcpp
 
 ### 1. Predicting New Sequences
@@ -58,7 +59,7 @@ Execute the main script:
 
 ```bash
 python PerseuCPP.py
-
+```
 
 You will see the following menu:
       1 - TRAINING MODEL
@@ -100,7 +101,7 @@ The path to your negative dataset (sequences labeled as non-CPPs)
 ```bash
 Positives path: DATASETS/positives.fasta
 Negatives path: DATASETS/negatives.fasta
-
+```
 The pipeline will:
 
 Extract features
