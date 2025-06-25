@@ -1,10 +1,12 @@
-# PERSEUcpp
-PERSEUcpp: A machine learning strategy to predict cell-penetrating peptides and their uptake efficiency
-PERSEUcpp is a machine learning pipeline developed to predict whether a given peptide sequence has cell-penetrating properties and estimate its uptake efficiency.
+# PerseuCPP: A Machine Learning Strategy to Predict Cell-Penetrating Peptides and Their Uptake Efficiency
+
+**PerseuCPP** is a machine learning pipeline developed to predict whether a given peptide sequence has cell-penetrating properties and estimate its uptake efficiency.  
 This repository contains all code, datasets, models, and outputs necessary to reproduce the training process, make new predictions, and evaluate model performance.
 
-# Repository Structure
-.
+---
+
+## Repository Structure
+
 
 ├── DATASETS/              # Datasets used for training and testing
 
@@ -30,8 +32,97 @@ This repository contains all code, datasets, models, and outputs necessary to re
 
 └── README.md              # This file
 
-Our source code is titled PERSEUcpp.py, and in it, you will find how the all descriptors calculations were done and how the model was trained.
 
-To run PERSEUcpp, you only need to run PERSEUcpp.py and enter the path of the desired file. For example, if you have the file cpps-test.fasta, simply enter its full name and submit it. The CPPs and their respective efficiencies will be predicted.
 
-The model accepts both FASTA and CSV files. For the FASTA format, you must follow the standard FASTA file structure. For the CSV format, the file should contain a single column with only the sequences.
+
+---
+
+## Dependencies
+
+To run this project, you need to have **Python 3.8 or higher** installed.
+
+We recommend creating a virtual environment to avoid conflicts.  
+You can set up your environment by running:
+
+```bash
+python -m venv perseu-env
+source perseu-env/bin/activate  # On Windows use: perseu-env\Scripts\activate
+
+pip install -r requirements.txt
+
+## How to Run PERSEUcpp
+
+### 1. Predicting New Sequences
+
+Execute the main script:
+
+```bash
+python PerseuCPP.py
+
+
+You will see the following menu:
+      1 - TRAINING MODEL
+
+      2 - TESTING MODEL
+
+Choose option 2 - TESTING MODEL if you want to classify new sequences using the pretrained model (PERSEU_MODEL.pkl included in this repository).
+
+You will be asked to enter the file path to your dataset.
+
+Accepted input formats:
+
+FASTA: Standard FASTA format.
+
+CSV: CSV file containing a single column with peptide sequences.
+
+Example:
+Data path: cpp-test.fasta
+
+The prediction results will be saved into the RESULTS/ directory as results-cpp-mlcpp.csv, containing:
+
+seq: the original peptide sequence
+
+prob: probability score of being a CPP
+
+Classification: predicted class (1 = CPP, 0 = non-CPP)
+
+
+### 2. Training a New Model (Optional)
+
+If you wish to retrain the model using your own datasets, select option 1 - TRAINING MODEL after executing PerseuCPP.py.
+
+You will be prompted to provide:
+
+The path to your positive dataset (sequences labeled as CPPs)
+
+The path to your negative dataset (sequences labeled as non-CPPs)
+
+```bash
+Positives path: DATASETS/positives.fasta
+Negatives path: DATASETS/negatives.fasta
+
+The pipeline will:
+
+Extract features
+
+Generate the training matrix
+
+Perform repeated 10x10 cross-validation
+
+Display and save performance metrics
+
+Save the new trained model as model.pkl
+
+
+## Notes on Feature Extraction
+Several handcrafted features are calculated, including:
+
+Amino acid composition
+
+Dipeptide and tripeptide frequencies
+
+Physicochemical properties (molecular weight, isoelectric point, net charge, hydropathy)
+
+CKSAAGP features (K-spaced amino acid group pairs with k=1)
+
+Sequences containing ambiguous amino acids (X, B, Z, J, O, U, *, -) are automatically filtered.
