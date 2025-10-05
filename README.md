@@ -58,7 +58,7 @@ pip install -r requirements.txt
 Execute the main script:
 
 ```bash
-python PerseuCPP.py
+python PERSEUcpp.py
 ```
 
 You will see the following menu:
