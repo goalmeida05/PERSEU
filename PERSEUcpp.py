@@ -1,28 +1,19 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
-from collections import Counter
 
 from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
 from Bio.SeqUtils import ProtParamData
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
 
-
 from sklearn.metrics import make_scorer, precision_score, recall_score
 from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.model_selection import RepeatedKFold, RepeatedStratifiedKFold, cross_validate
-from sklearn.metrics import roc_auc_score, confusion_matrix
+from sklearn.model_selection import RepeatedKFold, cross_validate
 import pickle
 import pandas as pd
 
-
-
-import utils
+import utils as utils
 from utils import aminos as aminos_dict
-from scipy.stats import pearsonr
+from pathlib import Path
 
 
 
@@ -457,6 +448,62 @@ cabecalho = ['seq', 'len', 'R', 'normR', 'K', 'normK', 'A',  'normA',
              'norm_positively_charged_positively_charged_CKSAAGP', 'norm_positively_charged_negatively_charged_CKSAAGP', 'norm_negatively_charged_hydrophobic_CKSAAGP',
              'norm_negatively_charged_polar_non_charged_CKSAAGP', 'norm_negatively_charged_positively_charged_CKSAAGP', 'norm_negatively_charged_negatively_charged_CKSAAGP']
 
+top_features = ['seq','Norm_isoelectric_point', 'normnO', 'Norm_net_charge', 'normnN',
+                'norm_positively_charged_positively_charged_CKSAAGP', 'norm_polar_non_charged_hydrophobic_CKSAAGP',
+                'normRN', 'norm_hydrophobic_negatively_charged_CKSAAGP', 'Norm_gravy',
+                'norm_hydrophobic_positively_charged_CKSAAGP', 'norm_negatively_charged_polar_non_charged_CKSAAGP',
+                'norm_negatively_charged_hydrophobic_CKSAAGP', 'norm_positively_charged_hydrophobic_CKSAAGP',
+                'normnH', 'RRR', 'KKR', 'norm_hydrophobic_polar_non_charged_CKSAAGP', 'normKG', 'Norm_hidro/total',
+                'norm_polar_non_charged_negatively_charged_CKSAAGP', 'normnC', 'normRG', 'Norm_mass',
+                'norm_hydrophobic_hydrophobic_CKSAAGP', 'normKN', 'normWG', 'KKK',
+                'norm_polar_non_charged_positively_charged_CKSAAGP', 'norm_polar_non_charged_polar_non_charged_CKSAAGP',
+                'normnS', 'VTT', 'norm_positively_charged_polar_non_charged_CKSAAGP', 'normLG', 'normAH', 'normRS',
+                'normFV', 'RQR', 'normPG', 'QRR', 'normLL', 'norm_negatively_charged_negatively_charged_CKSAAGP', 'RKK',
+                'normKV', 'normLP', 'norm_negatively_charged_positively_charged_CKSAAGP', 'KRK', 'normPL', 'normWN',
+                'normKH', 'normVG', 'norm_positively_charged_negatively_charged_CKSAAGP', 'GSG', 'normLN', 'CIC', 'KAL',
+                'IIY', 'KRR', 'normPS', 'normQN', 'normVD', 'normDF', 'normQY', 'RKV', 'normLH', 'IYR', 'RRQ', 'normGN',
+                'normFN', 'normGH', 'normRF', 'normRD', 'normCN', 'LKA', 'normSL', 'normCD', 'normVR', 'YSP', 'normTD',
+                'normAN', 'normGG', 'KLA', 'normRM', 'NRR', 'DLI', 'AGY', 'normVN', 'normLM', 'normLD', 'normKR', 'YLL',
+                'normIQ', 'GCG', 'normTQ', 'RWR', 'normIT', 'SPT', 'normHN', 'normQH', 'normPC', 'normLS', 'normKP', 'IPP',
+                'normKA', 'normWC', 'normKF', 'ADE', 'GRK', 'MII', 'normNV', 'ALA', 'normTR', 'normRP', 'FPQ', 'normTL',
+                'WFQ', 'normKD', 'LPP', 'IWF', 'PTT', 'RRA', 'normWH', 'normSN', 'normER', 'TTE', 'TPK', 'normIV', 'normRL',
+                'normSH', 'TTR', 'normKS', 'LLR', 'normFH', 'normMV', 'PPV', 'normNL', 'normDV', 'RMK', 'normGP', 'normED',
+                'normFD', 'normGM', 'normVH', 'RIL', 'CGS', 'normPQ', 'normEA', 'normGC', 'GRR', 'normRA', 'GRC', 'normMF',
+                'normQV', 'LWE', 'normTN', 'normYP', 'normNP', 'normFW', 'normAL', 'normRH', 'normAQ', 'GYL', 'SLQ', 'normRK',
+                'normAP', 'RDL', 'normPP', 'normGF', 'RNC', 'normIN', 'FRI', 'normRQ', 'normFY', 'normIF', 'normSV', 'normIH',
+                'normDR', 'LKL', 'PKK', 'LKK', 'normVK', 'LPV', 'normSS', 'normFL', 'normQW', 'normSP', 'normNN', 'normIL', 'FNK',
+                'normYH', 'normSD', 'normHH', 'normRV', 'normYN', 'normAR', 'normPR', 'normWL', 'normKY', 'ACR', 'normNH',
+                'normIG', 'normSC', 'normGD', 'normEW', 'normRE', 'normCR', 'normPH', 'normVC', 'LKY', 'normDH', 'normPA',
+                'normLR', 'normCV', 'normLQ', 'LAL', 'AKK', 'normGR', 'normTV', 'normIP', 'normHG', 'normTP', 'normGL', 'CKK',
+                'normHY', 'normKQ', 'WKK', 'PPP', 'ACI', 'RWK', 'FQN', 'PPK', 'RGD', 'LCK', 'normIY', 'normSE', 'normAF',
+                'normID', 'normRT', 'TKS', 'normSF', 'YHV', 'normQR', 'KIL', 'normLF', 'VID', 'TFP', 'normAG', 'RRM', 'RFR',
+                'normFR', 'SGS', 'normPM', 'normKW', 'normST', 'WSQ', 'GWT', 'RQI', 'normAD', 'normSQ', 'normLC', 'normLA',
+                'normGA', 'normDN', 'normIM', 'WLK', 'RSL', 'normVQ', 'normGT', 'normNM', 'normQG', 'normNF', 'normSM', 'RRI',
+                'normRR', 'normHV', 'normFP', 'SNF', 'normVL', 'normEN', 'GKK', 'normRY', 'normAA', 'normHE', 'normGK', 'normTF',
+                'RYG', 'normTW', 'STG', 'TRR', 'normLK', 'RIR', 'normVF', 'SLW', 'normYK', 'normGY', 'normSR', 'normPD', 'normRC',
+                'QNR', 'AAR', 'normAK', 'TCN', 'KWK', 'normSG', 'PWD', 'normTY', 'normKI', 'HFR', 'KKN', 'normDE', 'normHD',
+                'normGE', 'WRW', 'normEH', 'normAE', 'normPN', 'RKQ', 'VAL', 'normTH', 'KKL', 'normQL', 'RHH', 'normDG', 'RRC',
+                'LAK', 'normVA', 'LTT', 'normEV', 'YGR', 'normQD', 'RGR', 'normNG', 'normGQ', 'QQH', 'PAR', 'MKW', 'normCP',
+                'IFR', 'normRI', 'LWM', 'normKL', 'TWL', 'PVM', 'normPF', 'PSS', 'CTK', 'IGC', 'HLL', 'normEF', 'normSA', 'PSK',
+                'normEM', 'normHL', 'ARR', 'SNH', 'ISH', 'RCT', 'FST', 'RRE', 'normPI', 'normNA', 'TSR', 'PKH', 'normKK',
+                'normEP', 'RIA', 'normDQ', 'normKM', 'YPR', 'normFM', 'RGC', 'normEG', 'LLK', 'normIK', 'KKP', 'normDY',
+                'normWY', 'normKC', 'normQF', 'normWR', 'CRW', 'MKI', 'normYD', 'KIW', 'normEK', 'normIR', 'normFF', 'HRL',
+                'KKG', 'normCL', 'normQA', 'normYR', 'normNR', 'normAI', 'RPK', 'IKI', 'DKG', 'PPQ', 'normCK', 'PPR', 'PIK',
+                'LRP', 'KKT', 'GLK', 'KPT', 'PVL', 'ASR', 'DSP', 'RRH', 'normEI', 'KGD', 'KTR', 'normEQ', 'HSK', 'normMA',
+                'normGI', 'RWY', 'LWK', 'normAC', 'RVR', 'MAA', 'normWW', 'WSL', 'normQK', 'PWK', 'CTW', 'normIA', 'normVM',
+                'SRP', 'TPI', 'FRR', 'AHS', 'ARL', 'RRP', 'RLE', 'normQT', 'LAH', 'KYH', 'RRS', 'LRR', 'WRC', 'KKI', 'RLR',
+                'normSY', 'normWI', 'normDK', 'CRS', 'RCK', 'NKP', 'ALK', 'normMD', 'HKK', 'HLA', 'WKC', 'HTD', 'RKL', 'PRR',
+                'KCF', 'RYS', 'normDA', 'WHV', 'RAV', 'normET', 'normTE', 'IFI', 'KMD', 'SSS', 'ARA', 'normAW', 'normDC', 
+                'ALW', 'QIK', 'normEC', 'QAH', 'RPR', 'normDT', 'LRK', 'WKM', 'PTL', 'RRG', 'normYF', 'RKR', 'GGR', 'PRP',
+                'HHH', 'RIK', 'normDM', 'FAV', 'PWH', 'normDI', 'RFS', 'RNK', 'normDD', 'KAA', 'RAA', 'VPT', 'RSK', 'KAK',
+                'AAW', 'HAH', 'IRR', 'FRF', 'KKA', 'normMC', 'normQI', 'FFN', 'NKR', 'SPF', 'KRL', 'SRA', 'WRA', 'IPN', 'MLK',
+                'FKK', 'SWR', 'RAR', 'GSP', 'HRH', 'GAY', 'PAL', 'normNW', 'normPY', 'GRQ', 'QAR', 'RFK', 'SAW', 'LLH', 'normYC',
+                'normMY', 'LKP', 'HLR', 'LRH', 'LKR', 'FRK', 'WEA', 'CAR', 'PML', 'AKS', 'FRV', 'FFR', 'WFW', 'RVT', 'RRW',
+                'HHR', 'WRR', 'HRR', 'HVL','label']
+
+top20 = ['seq', 'Norm_isoelectric_point', 'normnO', 'Norm_net_charge', 'normnN','norm_positively_charged_positively_charged_CKSAAGP',
+         'Norm_gravy', 'Norm_hidro/total', 'norm_polar_non_charged_hydrophobic_CKSAAGP', 'norm_hydrophobic_positively_charged_CKSAAGP',
+          'normnH', 'Norm_mass', 'normnC', 'normKG', 'normRN', 'RRR', 'normnS', 'normKN', 'normRG', 'normPG', 'KKR', 'label']
 scoring = {
     'ACC':  'accuracy',
     'PR':   'precision',
@@ -467,7 +514,6 @@ scoring = {
     'AUC':  'roc_auc',
     'MCC': 'matthews_corrcoef'
     }
-
 
 amino_acid_groups = {
     'hydrophobic': ['A', 'V', 'L', 'I', 'M', 'F', 'W', 'C'],
@@ -508,10 +554,12 @@ def calculate_ksaagp(sequence, k):
 ########################################################### FEATURE MATRIX ####################################################################
 ##############################################################################################################################################
 
-def calc_properties(file_path):
+def calc_properties_test(file_path):
+    if 'label' in cabecalho:
+        cabecalho.remove('label')
+    
     sequence_list = set()
-    unwanted_chars = {'*', '-', 'X', 'O', 'U', 'Z', 'B', 'J', 'u'}
-
+    unwanted_chars = {'(','*', '-', 'X', 'O', 'U', 'Z', 'B', 'J', 'u'}
 
     if file_path.split('.')[-1] == 'fasta':
         for record in SeqIO.parse(file_path, 'fasta'):
@@ -603,65 +651,222 @@ def calc_properties(file_path):
 
 ############################################################################################################################################
 
+def calc_properties_training(file_path, label:int):
+    if 'label' not in cabecalho:
+        cabecalho.append('label')
 
+    sequence_list = set()
+    unwanted_chars = {'(','*', '-', 'X', 'O', 'U', 'Z', 'B', 'J', 'u'}
+
+
+    if file_path.split('.')[-1] == 'fasta':
+        for record in SeqIO.parse(file_path, 'fasta'):
+            if any(char in record.seq for char in unwanted_chars):
+                continue
+            sequence_list.add(record.seq)
+
+    else:
+        df = pd.read_csv(file_path)
+        for seq in df.iloc[:, 0]:  
+            if any(char in seq for char in unwanted_chars):
+                continue
+            sequence_list.add(seq)
+                
+    list_len = len(sequence_list)
+    matrix = np.zeros((list_len, len(cabecalho)), dtype=object) 
+
+    scale = ProtParamData.gravy_scales.get('KyteDoolitle')
+
+    for i, seq in enumerate(sequence_list):
+        sequence = ProteinAnalysis(seq)
+        seq_str = str(sequence.sequence)
+        matrix[i][0] = str(sequence.sequence)  
+        matrix[i][1] = sequence.length   
+        sequence.count_amino_acids()
+
+        for j, amino in enumerate(['R', 'K', 'A', 'L', 'G', 'C', 'W', 'P', 'H']): 
+            matrix[i][(j+1)*2] = sequence.amino_acids_content[amino]                        
+            matrix[i][(j+1)*2 + 1] = sequence.amino_acids_content[amino] / sequence.length  
+
+        matrix[i][20] = sequence.molecular_weight()   
+        matrix[i][21] = sequence.isoelectric_point()  
+        matrix[i][22] = sequence.charge_at_pH(7.0)    
+
+        gravy = sequence.gravy()
+        matrix[i][23] = gravy
+
+       
+        hydrophilic_residues = 0
+        for a in sequence.sequence:
+            if scale[a] < 0:
+                hydrophilic_residues += 1
+
+        matrix[i][24] = hydrophilic_residues / sequence.length
+
+        
+        plus_one = (1 / (sequence.length - 2 + 1))
+        for j in range(sequence.length - 2 + 1):
+            matrix[i][(utils.aminos[sequence.sequence[j]]['id'] * 20 + utils.aminos[sequence.sequence[j+1]]['id'] ) * 2 + 19] += 1
+            matrix[i][(utils.aminos[sequence.sequence[j]]['id'] * 20 + utils.aminos[sequence.sequence[j+1]]['id'])* 2 + 19 + 1] += plus_one
+
+        for amino, count in sequence.amino_acids_content.items():
+            matrix[i][825] += aminos_dict[amino]['nC'] * count
+            matrix[i][827] += aminos_dict[amino]['nH'] * count
+            matrix[i][829] += aminos_dict[amino]['nN'] * count
+            matrix[i][831] += aminos_dict[amino]['nO'] * count
+            matrix[i][833] += aminos_dict[amino]['nS'] * count
+
+        
+        matrix[i][827] -= 2 * (sequence.length - 1) # H2
+        matrix[i][831] -= sequence.length - 1 # 0
+
+        total_elements = np.sum(matrix[i, [825, 827, 829, 831, 833]])
+        matrix[i][835] = total_elements
+        for j in range(5):
+            matrix[i][826 + (j * 2)] = matrix[i][825 + (j * 2)] / total_elements
+
+        for j in range(sequence.length - 3 + 1):
+            tri_id = 836 + (utils.aminos_id[sequence.sequence[j]] * 400 + 
+              utils.aminos_id[sequence.sequence[j + 1]] * 20 + 
+              utils.aminos_id[sequence.sequence[j + 2]])
+            matrix[i][tri_id] += (1 / (sequence.length - 3 + 1))
+        
+        matrix[i][8836] = (sequence.molecular_weight() - 516.6314)/(5121.012000000002 - 516.6314)   
+        matrix[i][8837] = (sequence.isoelectric_point() - 4.0500284194946286)/ (12.999967765808105 - 4.0500284194946286)
+        matrix[i][8838] = (sequence.charge_at_pH(7.0) + 8.173321821201688)/(23.75392760999528 + 8.173321821201688)  
+        matrix[i][8839] = (gravy + 4.5)/(2.7111111111111112 + 4.5) 
+        matrix[i][8840] = hydrophilic_residues / sequence.length
+
+        k_spaced_pairs = calculate_ksaagp(seq, k=1)
+        start_index = 8841  
+
+       
+        for j, pair in enumerate(k_spaced_pairs):
+            matrix[i][start_index + j] = k_spaced_pairs.get(pair, 0)
+
+        matrix[i][-1] = label
+    return matrix
 
 ##############################################################################################################################################
 ########################################################### MATRIX GENERATION ####################################################################
 ##############################################################################################################################################
 
+##TRAINING MATRIX
+def training_matrix(positives_path, negatives_path): 
+    positive_matrix = calc_properties_training(positives_path, 1)
+    negative_matrix = calc_properties_training(negatives_path, 0)
+    df_positives = pd.DataFrame(positive_matrix, columns=cabecalho).infer_objects()
+    df_negatives = pd.DataFrame(negative_matrix, columns=cabecalho).infer_objects()
+    df = pd.concat([df_positives, df_negatives], ignore_index=True).sample(frac=1, random_state=35, ignore_index=True)
 
-def matrix_generation(data):
-    matrix = calc_properties(data)
+    df.to_csv(f'cpps_trained_matrix.csv', index=False)
+    
+    negatives, positives = df['label'].value_counts()
+    print(f'Training Matrix was generated.\nPositives Samples: {positives}, Negative Samples: {negatives}')
+    
+    return df
+
+
+
+##TEST MATRIX
+def test_matrix(data, top_features):
+
+    matrix = calc_properties_test(data)
     df = pd.DataFrame(matrix, columns=cabecalho).infer_objects()
-    df.to_csv(f'cpps-matrix.csv', index=False)
-    print(f'Training Matrix was generated and save as CSV.')
+    if 'label' in top_features:
+        top_features.remove('label')
+    df = df[top_features]
+    df.to_csv(f'cpps_test_matrix.csv', index=False)
+    print(f'Test Matrix was generated and saved as CSV.')
+
     return df
 
 ############################################################################################################################################
 
+############################################################################################################################################
+################################################# TRAINING MODEL ###########################################################################
+############################################################################################################################################
 
+def display_and_save_cv_scores(scores, scoring):
+    data = {
+        'Teste':  [f"{round(scores['test_'+metric].mean(), 4)} ({round(scores['test_'+metric].std(), 4)})" for metric in scoring.keys()],
+        'Treino': [f"{round(scores['train_'+metric].mean(), 4)} ({round(scores['train_'+metric].std(), 4)})" for metric in scoring.keys()]
+    }
+    df_scores = pd.DataFrame.from_dict(data, orient='index', columns=scoring.keys())
+    print(df_scores)
+    with open("scores", 'w') as f:
+        f.write(df_scores.to_string())
+
+def generated_trained_model(positives_path, negatives_path, top_features):
+    
+    df = training_matrix(positives_path, negatives_path)
+
+    df = df[top_features]
+    X_train = df.iloc[:, 1:-1]
+    y_train = df.iloc[:, -1]
+
+    # Modelo
+    model = ExtraTreesClassifier(bootstrap=False, criterion="gini", max_features=0.05, min_samples_leaf=2, min_samples_split=2, n_estimators=100)
+    # Validação cruzada
+    scores = cross_validate(estimator=model, X=X_train, y=y_train, 
+                            cv=RepeatedKFold(n_splits=10, n_repeats=10),
+                            scoring=scoring, return_train_score=True)
+
+    # Exibe e salva os scores da validação cruzada
+    display_and_save_cv_scores(scores, scoring)
+
+    # Treina o modelo com todos os dados
+    model.fit(X_train, y_train)
+    # Salva o modelo
+    pickle.dump(model, open(f'Your-New-Model.pkl', 'wb'))
+    print(f'Model was trained and saved as Your-New-Model.pkl!')
+
+##############################################################################################################################################
+################################################# TEST INDEPENDENT DATASET ####################################################################
+##############################################################################################################################################
 # Main Function
 def process_cpps(data):
 
     #Load model
-    model_cpp = pickle.load(open('PERSEU_MODEL.pkl', 'rb'))
+    model_cpp = pickle.load(open('PERSEU-MODEL.pkl', 'rb'))
     model_eff = pickle.load(open('PERSEU-Efficiency.pkl', 'rb'))
 
     # Feature Generation for classication
-    df_class = matrix_generation(data)
+    df_class = test_matrix(data, top_features)
 
     # Selecting just the top features were the model was trained
     X_cpps = df_class[model_cpp.feature_names_in_]
 
     # Classification Part
     y_cpps_probs = model_cpp.predict_proba(X_cpps)[:, 1]
-    y_cpps_pred = ['CPP' if p >= 0.5 else 'NON-CPP' for p in y_cpps_probs]
+    y_cpps_pred = [1 if p >= 0.5 else 0 for p in y_cpps_probs]
     df_cpp = pd.DataFrame({
             'seq': df_class.iloc[:, 0],
+            'prob': y_cpps_probs,
             'Classification': y_cpps_pred,
         })
     
-
     eff_df = df_class.merge(df_cpp, on='seq')
-    eff_df= eff_df[eff_df['Classification'] == 'CPP']
+    eff_df= eff_df[eff_df['Classification'] == 1]
     eff_df = eff_df.drop(columns=['Classification'])
-
-    # Selecting just the top features were the model was trained
-    X_cpps_eff = eff_df[model_eff.feature_names_in_]
-    
-    # Efficiency Classification Part
-    y_cpps_probs_eff = model_eff.predict_proba(X_cpps_eff)[:, 1]
-    y_cpps_pred_eff = ['High' if p >= 0.5 else 'Low' for p in y_cpps_probs_eff]
+    if not eff_df.empty:
+        # Selecting just the top features were the model was trained
+        X_cpps_eff = eff_df[model_eff.feature_names_in_]
         
-    df_cpp_eff = pd.DataFrame({
-            'seq': eff_df.iloc[:, 0],
-            'Classification': y_cpps_pred_eff,
-        })
-    
+        # Efficiency Classification Part
+        y_cpps_probs_eff = model_eff.predict_proba(X_cpps_eff)[:, 1]
+        y_cpps_pred_eff = ['High' if p >= 0.5 else 'Low' for p in y_cpps_probs_eff]
+            
+        df_cpp_eff = pd.DataFrame({
+                'seq': eff_df.iloc[:, 0],
+                'prob': y_cpps_probs_eff,
+                'Classification': y_cpps_pred_eff,
+            })
+        
 
-    df_result = df_cpp.merge(df_cpp_eff, on='seq', how='left', suffixes=('_cpp', '_eff'))
+        df_result = df_cpp.merge(df_cpp_eff, on='seq', how='left', suffixes=('_cpp', '_eff'))
 
-    df_result['Classification_eff'] = df_result['Classification_eff'].fillna('-')
+        df_result['Classification_eff'] = df_result['Classification_eff'].fillna('-')
     
     df_result.to_csv(f'Results.csv', index=False)
     print('Prediction results successfully generated!')
@@ -670,27 +875,117 @@ def process_cpps(data):
 ##############################################################################################################################################
 ##############################################################################################################################################
 ##############################################################################################################################################
+def get_step() -> int | None:
+    while True:
+        s = input("\nYour choice (1/2, or q to quit): ").strip().lower()
+        if s in {"1", "2"}:
+            return int(s)
+        if s == "q":
+            return None
+        print("Please enter 1 or 2 (or q to quit).")
 
+def prompt_existing_path(prompt_text: str) -> str | None:
+    """
+    Prompt for a filesystem path and ensure it is non-empty; warn if it doesn't exist.
+    Returns the raw input (user may use non-local paths); None on quit/interrupt.
+    """
+    try:
+        while True:
+            p = input(prompt_text).strip().strip('"').strip("'")
+            if not p:
+                print("Path cannot be empty. Please try again.")
+                continue
 
+            if not Path(p).exists():
+                print("Warning: the path does not seem to exist locally. Proceeding anyway.")
+            return p
+    except (EOFError, KeyboardInterrupt):
+        return None
+    
+from pathlib import Path
 
+def discover_files(
+    root: Path | str = Path.cwd(),
+    patterns: tuple[str, ...] = ("*.fasta", "*.fa", "*.faa", "*.fna", "*.csv"),
+    max_items: int = 50,
+) -> str:
+    """
+    Lista arquivos recursivamente sob `root` que casem os padrões.
+    Retorna um texto pronto para anexar ao print de ajuda.
+    """
+    root = Path(root)
+    hits: list[Path] = []
+    for pat in patterns:
+        hits.extend(root.rglob(pat))
+
+    # únicos + ordenados
+    hits = sorted(set(hits))
+    total = len(hits)
+
+    # corta para no máximo `max_items`
+    shown = hits[:max_items]
+    more = total - len(shown)
+
+    lines = [f"These are the matching top {max_items} files under your current folder ({root}):"]
+    if not shown:
+        lines.append("- (no FASTA/CSV files found)")
+    else:
+        for p in shown:
+            # caminho relativo pra ficar mais curto
+            rel = p.relative_to(root)
+            lines.append(f"- {rel.as_posix()}")
+        if more > 0:
+            lines.append(f"... and {more} more.")
+
+    return "\n".join(lines)
+
+help_text = """
+To run PERSEUcpp, you only need to provide the path to the input file.
+
+Examples:
+- Local FASTA:  C:/data/cpps-test.fasta
+- Local CSV:    /home/user/cpps.csv
+
+Accepted formats:
+• FASTA — follow the standard FASTA format.
+• CSV   — a single-column file containing only the sequences (no header is fine).
+
+After you submit the path, the model will predict which sequences are CPPs
+and estimate their uptake efficiency for those classified as CPPs.
+""".strip()
 
 
 print("""
-      To run PERSEUcpp, you only need to enter the path of the desired file.
-      For example, if you have the file cpps-test.fasta, simply enter its full name and submit it.
-      The CPPs and their respective efficiencies will be predicted.
-
-
-The model accepts both FASTA and CSV files.
-
-FASTA Format:
-- You must follow the standard FASTA file format.
-
-CSV Format:
-- A single-column file containing only the sequences.
+1) Train a new model using PERSEU's strategy
+2) Predict CPPs and their uptake efficiency
 """)
 
-data = input("\nData path:")
+step = get_step()
+if step is None:
+    print("Exiting...")
 
-process_cpps(data)
+elif step == 1:
+    positives_path = prompt_existing_path("Positives path: ")
+    if positives_path is None:
+        print("Exiting...")
+    else:
+        negatives_path = prompt_existing_path("Negatives path: ")
+        if negatives_path is None:
+            print("Exiting...")
+        else:
+            # top_features deve estar definido no seu escopo
+            generated_trained_model(positives_path, negatives_path, top_features)
+
+else:
+    print(help_text + "\n\n" + discover_files())
+
+    data = prompt_existing_path(
+    "\n\nEnter the full path to the input file you want to classify (CSV or FASTA).\n"
+    "Example: C:/data/cpps-test.fasta\n"
+    "Path: "
+    )
+    if data is None:
+        print("Exiting...")
+    else:
+        process_cpps(data)
 
