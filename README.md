@@ -16,7 +16,7 @@ This repository contains all code, datasets, models, and outputs necessary to re
 
 ├── PERSEU-MODEL.pkl       # Trained model for CPP classification
 
-├── PERSEU-EFFICIENCY.pkl  # (Optional) Efficiency prediction model (currently not fully integrated)
+├── PERSEU-EFFICIENCY.pkl  # Efficiency prediction model 
 
 ├── PERSEUcpp.py           # Main script: feature extraction, model training, and prediction
 
