@@ -14,11 +14,11 @@ This repository contains all code, datasets, models, and outputs necessary to re
 
 ├── RESULTS/               # Prediction results on each dataset
 
-├── PERSEU_MODEL.pkl       # Trained model for CPP classification
+├── PERSEU-MODEL.pkl       # Trained model for CPP classification
 
 ├── PERSEU-EFFICIENCY.pkl  # (Optional) Efficiency prediction model (currently not fully integrated)
 
-├── PerseuCPP.py           # Main script: feature extraction, model training, and prediction
+├── PERSEUcpp.py           # Main script: feature extraction, model training, and prediction
 
 ├── aminos.json            # Amino acid group and ID mappings
 
